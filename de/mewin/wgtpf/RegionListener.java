@@ -24,6 +24,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.metadata.FixedMetadataValue;
 
 /**
  *
@@ -32,10 +33,12 @@ import org.bukkit.event.Listener;
 public class RegionListener implements Listener
 {
     private WorldGuardPlugin wgp;
+    private WGTexturePackFlagPlugin plugin;
     
-    public RegionListener(WorldGuardPlugin wgp)
+    public RegionListener(WGTexturePackFlagPlugin plugin, WorldGuardPlugin wgp)
     {
         this.wgp = wgp;
+        this.plugin = plugin;
     }
     
     @EventHandler
@@ -53,6 +56,17 @@ public class RegionListener implements Listener
     private void updateTexturePack(Player player)
     {
         String tp = Util.getFlagValue(wgp, player.getLocation(), WGTexturePackFlagPlugin.TEXTUREPACK_FLAG);
+        
+        if (player.getMetadata("rgTexture").size() > 0
+                && player.getMetadata("rgTexture").get(0).asString().equalsIgnoreCase(tp))
+        {
+            return;
+        }
+        else
+        {
+            player.setMetadata("rgTexture", new FixedMetadataValue(plugin, tp));
+        }
+        
         if (tp != null)
         {
             player.setTexturePack(tp);

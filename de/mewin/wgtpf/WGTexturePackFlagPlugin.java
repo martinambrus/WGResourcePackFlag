@@ -60,7 +60,7 @@ public class WGTexturePackFlagPlugin extends JavaPlugin
             getLogger().log(Level.INFO, "Hooked into WorldGuard.");
         }
         
-        listener = new RegionListener(wgp);
+        listener = new RegionListener(this, wgp);
         getServer().getPluginManager().registerEvents(listener, this);
         
         wgcf.addCustomFlag(TEXTUREPACK_FLAG);
