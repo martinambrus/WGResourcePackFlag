@@ -69,7 +69,7 @@ public class RegionListener implements Listener
         
         if (tp != null)
         {
-            player.setTexturePack(tp);
+            player.setResourcePack(tp);
         }
         else
         {
