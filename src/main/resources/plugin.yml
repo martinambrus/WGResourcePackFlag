@@ -1,0 +1,5 @@
+name: WGTexturePackFlag
+authors: [ mewin ]
+version: 0.3
+main: de.mewin.wgtpf.WGTexturePackFlagPlugin
+depend: [ WorldGuard, WGCustomFlags, WGRegionEvents ]
