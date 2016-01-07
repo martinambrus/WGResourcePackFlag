@@ -17,46 +17,53 @@
 
 package de.mewin.wgtpf;
 
-import com.mewin.WGRegionEvents.events.RegionEnteredEvent;
-import com.mewin.WGRegionEvents.events.RegionLeftEvent;
-import com.mewin.util.Util;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.metadata.FixedMetadataValue;
 
-/**
- *
- * @author mewin<mewin001@hotmail.de>
- */
+import com.mewin.WGRegionEvents.events.RegionEnteredEvent;
+import com.mewin.WGRegionEvents.events.RegionLeftEvent;
+import com.mewin.util.Util;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.flags.Flag;
+
 public class RegionListener implements Listener
 {
     private WorldGuardPlugin wgp;
     private WGTexturePackFlagPlugin plugin;
-    
+
     public RegionListener(WGTexturePackFlagPlugin plugin, WorldGuardPlugin wgp)
     {
         this.wgp = wgp;
         this.plugin = plugin;
     }
-    
+
     @EventHandler
-    public void onRegionEntered(RegionEnteredEvent e)
-    {
-        updateTexturePack(e.getPlayer());
+    public void onRegionEntered(RegionEnteredEvent e) {
+    	this.updateTexturePack(e.getPlayer());
     }
-    
+
     @EventHandler
-    public void onRegionLeft(RegionLeftEvent e)
-    {
-        updateTexturePack(e.getPlayer());
+    public void onRegionLeft(RegionLeftEvent e) {
+    	this.updateTexturePack(e.getPlayer());
     }
-    
-    private void updateTexturePack(Player player)
-    {
-        String tp = Util.getFlagValue(wgp, player.getLocation(), WGTexturePackFlagPlugin.TEXTUREPACK_FLAG);
-        
+
+    private void updateTexturePack(Player player) {
+    	// nothing to do for a player who's declined resource packs
+    	if (this.plugin.playerHasPack.containsKey(player) && this.plugin.playerHasPack.get(player).equals(false)) {
+    		return;
+    	}
+
+    	if (this.plugin.playerProtection.containsKey(player)) {
+    		this.plugin.playerProtection.get(player).cancel();
+    		this.plugin.playerProtection.remove(player);
+    	}
+    	this.plugin.playerPackDownloading.put(player, false);
+
+        @SuppressWarnings({ "deprecation" })
+        String tp = (String)Util.getFlagValue(this.wgp, player.getLocation(), (Flag<?>)WGTexturePackFlagPlugin.TEXTUREPACK_FLAG);
+
         if (player.getMetadata("rgTexture").size() > 0
                 && player.getMetadata("rgTexture").get(0).asString().equalsIgnoreCase(tp))
         {
@@ -64,11 +71,12 @@ public class RegionListener implements Listener
         }
         else
         {
-            player.setMetadata("rgTexture", new FixedMetadataValue(plugin, tp));
+            player.setMetadata("rgTexture", new FixedMetadataValue(this.plugin, tp));
         }
-        
+
         if (tp != null)
         {
+        	this.plugin.playerPackDownloading.put(player, true);
             player.setResourcePack(tp);
         }
         else

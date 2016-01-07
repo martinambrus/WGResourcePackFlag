@@ -17,23 +17,20 @@
 
 package de.mewin.wgtpf;
 
+import org.bukkit.command.CommandSender;
+
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.StringFlag;
-import org.bukkit.command.CommandSender;
 
-/**
- *
- * @author mewin<mewin001@hotmail.de>
- */
 public class URLFlag extends StringFlag
 {
     public URLFlag(String name)
     {
         super(name);
     }
-    
+
     public URLFlag(String name, RegionGroup group)
     {
         super(name, group);
@@ -43,7 +40,7 @@ public class URLFlag extends StringFlag
     public String parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat
     {
         String lower = input.toLowerCase();
-        if (!lower.startsWith("http://") && !lower.startsWith("https://") && !lower.startsWith("ftp://") && !lower.startsWith("file://"))
+        if (!(lower.startsWith("http://") || lower.startsWith("https://") || lower.startsWith("ftp://") || lower.startsWith("file://")))
         {
             input = "http://" + input;
         }

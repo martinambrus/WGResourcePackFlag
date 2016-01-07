@@ -19,77 +19,84 @@ package de.mewin.wgtpf;
 
 import com.mewin.WGCustomFlags.WGCustomFlagsPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
+
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
-/**
- *
- * @author mewin<mewin001@hotmail.de>
- */
+
 public class WGTexturePackFlagPlugin extends JavaPlugin
 {
     public static final URLFlag TEXTUREPACK_FLAG = new URLFlag("texturepack");
-    
+    public Map<Player, BukkitTask> playerProtection = new HashMap<Player, BukkitTask>();
+    public Map<Player, Boolean> playerHasPack = new HashMap<Player, Boolean>();
+    public Map<Player, Boolean> playerPackDownloading = new HashMap<Player, Boolean>();
     private WGCustomFlagsPlugin wgcf;
     private WorldGuardPlugin wgp;
     private RegionListener listener;
+    private PlayerListener listener2;
     
     @Override
     public void onEnable()
     {
-        if (!getWGCF())
+        if (!this.getWGCF())
         {
-            getLogger().log(Level.SEVERE, "Could not find WGCustomFlags.");
-            getPluginLoader().disablePlugin(this);
+        	this.getLogger().log(Level.SEVERE, "Could not find WGCustomFlags.");
+        	this.getPluginLoader().disablePlugin(this);
             return;
         }
         else
         {
-            getLogger().log(Level.INFO, "Hooked into WGCustomFlags.");
+        	this.getLogger().log(Level.INFO, "Hooked into WGCustomFlags.");
         }
         
-        if (!getWorldGuard())
+        if (!this.getWorldGuard())
         {
-            getLogger().log(Level.SEVERE, "Could not find WorldGuard.");
-            getPluginLoader().disablePlugin(this);
+        	this.getLogger().log(Level.SEVERE, "Could not find WorldGuard.");
+        	this.getPluginLoader().disablePlugin(this);
             return;
         }
         else
         {
-            getLogger().log(Level.INFO, "Hooked into WorldGuard.");
+        	this.getLogger().log(Level.INFO, "Hooked into WorldGuard.");
         }
         
-        listener = new RegionListener(this, wgp);
-        getServer().getPluginManager().registerEvents(listener, this);
+        this.listener = new RegionListener(this, this.wgp);
+        this.listener2 = new PlayerListener(this);
+        this.getServer().getPluginManager().registerEvents(this.listener, this);
+        this.getServer().getPluginManager().registerEvents(this.listener2, this);
         
-        wgcf.addCustomFlag(TEXTUREPACK_FLAG);
+        this.wgcf.addCustomFlag(TEXTUREPACK_FLAG);
     }
     
     private boolean getWGCF()
     {
-        Plugin plug = getServer().getPluginManager().getPlugin("WGCustomFlags");
+        Plugin plug = this.getServer().getPluginManager().getPlugin("WGCustomFlags");
         if (plug == null || !(plug instanceof WGCustomFlagsPlugin))
         {
             return false;
         }
         else
         {
-            wgcf = (WGCustomFlagsPlugin) plug;
+        	this.wgcf = (WGCustomFlagsPlugin) plug;
             return true;
         }
     }
     
     private boolean getWorldGuard()
     {
-        Plugin plug = getServer().getPluginManager().getPlugin("WorldGuard");
+        Plugin plug = this.getServer().getPluginManager().getPlugin("WorldGuard");
         if (plug == null || !(plug instanceof WorldGuardPlugin))
         {
             return false;
         }
         else
         {
-            wgp = (WorldGuardPlugin) plug;
+        	this.wgp = (WorldGuardPlugin) plug;
             return true;
         }
     }
