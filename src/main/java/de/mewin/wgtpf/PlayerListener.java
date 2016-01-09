@@ -8,6 +8,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
 public class PlayerListener implements Listener {
@@ -42,7 +43,7 @@ public class PlayerListener implements Listener {
     }
 
     // prevent any damage and pushing of the player while loading a resource pack
-    @EventHandler
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerDamage(EntityDamageEvent event) {
     	if (this.plugin.playerProtection.size() == 0 && this.plugin.playerPackDownloading.size() == 0) {
     		return;
@@ -57,6 +58,16 @@ public class PlayerListener implements Listener {
     	    	damager.sendMessage(ChatColor.GREEN + "This player is protected while loading a Resource Pack.");
 	            event.setCancelled(true);
 	        }
+    	}
+    }
+
+    // remove player from declined list in case they clicked Decline accidentally and want to load the pack
+    // on their next login
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerLogout(PlayerQuitEvent event) {
+    	Player player = event.getPlayer();
+    	if (this.plugin.playerHasPack.containsKey(player)) {
+    		this.plugin.playerHasPack.remove(player);
     	}
     }
 }
