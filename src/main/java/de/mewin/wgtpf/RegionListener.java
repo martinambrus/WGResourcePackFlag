@@ -41,25 +41,22 @@ public class RegionListener implements Listener
 
     @EventHandler
     public void onRegionEntered(RegionEnteredEvent e) {
+    	//Bukkit.getLogger().info("Entering.");
     	this.updateTexturePack(e.getPlayer());
     }
 
     @EventHandler
     public void onRegionLeft(RegionLeftEvent e) {
+    	//Bukkit.getLogger().info("Leaving.");
     	this.updateTexturePack(e.getPlayer());
     }
 
     private void updateTexturePack(Player player) {
     	// nothing to do for a player who's declined resource packs
     	if (this.plugin.playerHasPack.containsKey(player) && this.plugin.playerHasPack.get(player).equals(false)) {
+    		//Bukkit.getLogger().info("Bailing out.");
     		return;
     	}
-
-    	if (this.plugin.playerProtection.containsKey(player)) {
-    		this.plugin.playerProtection.get(player).cancel();
-    		this.plugin.playerProtection.remove(player);
-    	}
-    	this.plugin.playerPackDownloading.put(player, false);
 
         @SuppressWarnings({ "deprecation" })
         String tp = (String)Util.getFlagValue(this.wgp, player.getLocation(), (Flag<?>)WGTexturePackFlagPlugin.TEXTUREPACK_FLAG);
@@ -67,20 +64,30 @@ public class RegionListener implements Listener
         if (player.getMetadata("rgTexture").size() > 0
                 && player.getMetadata("rgTexture").get(0).asString().equalsIgnoreCase(tp))
         {
+           	//Bukkit.getLogger().info("Texture pack already loaded (" + tp + ").");
             return;
         }
         else
         {
+           	//Bukkit.getLogger().info("Will load texture pack: " + tp);
+        	if (this.plugin.playerProtection.containsKey(player)) {
+        		this.plugin.playerProtection.get(player).cancel();
+        		this.plugin.playerProtection.remove(player);
+        	}
+        	this.plugin.playerPackDownloading.put(player, false);
+
             player.setMetadata("rgTexture", new FixedMetadataValue(this.plugin, tp));
         }
 
         if (tp != null)
         {
+           	//Bukkit.getLogger().info("Now loading texture pack.");
         	this.plugin.playerPackDownloading.put(player, true);
             player.setResourcePack(tp);
         }
         else
         {
+           	//Bukkit.getLogger().info("Texture pack was null!");
             //player.setTexturePack("");
         }
     }
